@@ -7,6 +7,7 @@ import {
   updateMember,
   deleteMember,
 } from "../../services/member";
+import { getCustomers, Customer } from "../../services/customer";
 
 type Member = {
   member_id: number;
@@ -19,6 +20,7 @@ type Member = {
 
 export default function MembersPage() {
   const [data, setData] = useState<Member[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
@@ -31,11 +33,17 @@ export default function MembersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
   // FETCH DATA
   const fetchData = async () => {
     try {
-      const res = await getMembers();
-      setData(res);
+      const [membersRes, customersRes] = await Promise.all([
+        getMembers(),
+        getCustomers(),
+      ]);
+      setData(membersRes);
+      setCustomers(customersRes);
     } catch (err) {
       console.error("Error fetching data:", err);
     }
@@ -46,7 +54,9 @@ export default function MembersPage() {
   }, []);
 
   // HANDLE INPUT
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -64,7 +74,7 @@ export default function MembersPage() {
       };
 
       if (!payload.customer_id) {
-        alert("Customer ID wajib diisi");
+        alert("Customer ID is required");
         return;
       }
 
@@ -81,6 +91,7 @@ export default function MembersPage() {
       });
 
       setEditId(null);
+      setIsFormVisible(false);
       fetchData();
     } catch (err) {
       console.error("Submit error:", err);
@@ -95,11 +106,12 @@ export default function MembersPage() {
       customer_id: String(item.customer_id),
       address: item.address,
     });
+    setIsFormVisible(true);
   };
 
   // DELETE
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin hapus data?")) return;
+    if (!confirm("Are you sure you want to delete this data?")) return;
 
     try {
       await deleteMember(id);
@@ -122,7 +134,15 @@ export default function MembersPage() {
         Members
       </h1>
 
+      <button
+        onClick={() => setIsFormVisible(!isFormVisible)}
+        className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+      >
+        {isFormVisible ? "Hide Form" : "Show Form"}
+      </button>
+
       {/* FORM */}
+      {isFormVisible && (
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-2 gap-4 bg-white p-4 rounded shadow"
@@ -135,13 +155,19 @@ export default function MembersPage() {
           className="border p-2 rounded"
         />
 
-        <input
+        <select
           name="customer_id"
-          placeholder="Customer ID"
           value={formData.customer_id}
           onChange={handleChange}
           className="border p-2 rounded"
-        />
+        >
+          <option value="">Select Customer</option>
+          {customers.map((customer) => (
+            <option key={customer.customer_id} value={customer.customer_id}>
+              {customer.customer_name}
+            </option>
+          ))}
+        </select>
 
         <input
           name="address"
@@ -155,9 +181,10 @@ export default function MembersPage() {
           type="submit"
           className="col-span-2 bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700"
         >
-          {editId ? "Update Member" : "Tambah Member"}
+          {editId ? "Update Member" : "Add Member"}
         </button>
       </form>
+      )}
 
       {/* TABLE */}
       <div className="overflow-x-auto bg-white rounded shadow">
@@ -217,7 +244,7 @@ export default function MembersPage() {
                       onClick={() => handleDelete(item.member_id)}
                       className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
                     >
-                      Hapus
+                      Delete
                     </button>
 
                   </td>

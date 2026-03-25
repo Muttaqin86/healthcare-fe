@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, Stethoscope, FileText } from "lucide-react";
+import { Users, Stethoscope, FileText, Building2, HeartPulse, User } from "lucide-react";
 import Link from "next/link";
 
 export default function Sidebar({ open }: { open: boolean }) {
@@ -30,11 +30,12 @@ export default function Sidebar({ open }: { open: boolean }) {
           <MenuItem icon={<FileText size={20} />} label="Reports" />
         </nav> */}
         <nav className="space-y-2 text-emerald-700">
-        <MenuItem icon={<FileText size={20} />} label="Payors" href="/payors" />
-        <MenuItem icon={<FileText size={20} />} label="Customers" href="/customers" />
-        <MenuItem icon={<FileText size={20} />} label="Providers" href="/providers" />
-        <MenuItem icon={<Users size={20} />} label="Members" href="/members" />
-        <MenuItem icon={<Stethoscope size={20} />} label="Claims" href="/claims" />
+        <MenuItem icon={<Building2 size={20} />} label="Payors" href="/payors" />
+        <MenuItem icon={<Users size={20} />} label="Customers" href="/customers" />
+        <MenuItem icon={<User size={20} />} label="Members" href="/members" />
+        <MenuItem icon={<HeartPulse size={20} />} label="Providers" href="/providers" />
+        <MenuItem icon={<Stethoscope size={20} />} label="Diagnosis" href="/diagnosis" />
+        <MenuItem icon={<FileText size={20} />} label="Claims" href="/claims" />
         {/* <MenuItem icon={<FileText size={20} />} label="Reports" href="/reports" /> */}
         </nav>
       </div>

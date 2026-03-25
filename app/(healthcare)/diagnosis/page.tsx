@@ -1,22 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getPayors, createPayor, updatePayor, deletePayor, Payor } from "../../services/payor";
-import PayorForm from "./components/PayorForm";
+import {
+  getDiagnoses,
+  createDiagnosis,
+  updateDiagnosis,
+  deleteDiagnosis,
+} from "../../services/diagnosis";
 
-export default function PayorsPage() {
-  const [data, setData] = useState<Payor[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingPayor, setEditingPayor] = useState<Payor | null>(null);
+type Diagnosis = {
+  diagnosis_id: number;
+  icd_code: string;
+  description: string;
+};
+
+export default function DiagnosisPage() {
+  const [data, setData] = useState<Diagnosis[]>([]);
+  const [editId, setEditId] = useState<number | null>(null);
+
+  const [formData, setFormData] = useState({
+    icd_code: "",
+    description: "",
+  });
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
   // FETCH DATA
   const fetchData = async () => {
     try {
-      const res = await getPayors();
+      const res = await getDiagnoses();
       setData(res);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -27,45 +43,58 @@ export default function PayorsPage() {
     fetchData();
   }, []);
 
-  const handleAdd = () => {
-    setEditingPayor(null);
-    setIsFormOpen(true);
+  // HANDLE INPUT
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleEdit = (payor: Payor) => {
-    setEditingPayor(payor);
-    setIsFormOpen(true);
-  };
+  // SUBMIT (CREATE / UPDATE)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleDelete = async (payor_id: number) => {
-    if (window.confirm('Are you sure you want to delete this payor?')) {
-      try {
-        await deletePayor(payor_id);
-        fetchData();
-      } catch (error) {
-        console.error('Failed to delete payor', error);
-      }
-    }
-  };
-
-  const handleSave = async (payorData: Omit<Payor, 'payor_id'>) => {
     try {
-      if (editingPayor) {
-        await updatePayor(editingPayor.payor_id, payorData);
+      if (editId) {
+        await updateDiagnosis(editId, formData);
       } else {
-        await createPayor(payorData);
+        await createDiagnosis(formData);
       }
+
+      setFormData({
+        icd_code: "",
+        description: "",
+      });
+
+      setEditId(null);
+      setIsFormVisible(false);
       fetchData();
-      setIsFormOpen(false);
-      setEditingPayor(null);
-    } catch (error) {
-      console.error('Failed to save payor', error);
+    } catch (err) {
+      console.error("Submit error:", err);
     }
   };
 
-  const handleCancel = () => {
-    setIsFormOpen(false);
-    setEditingPayor(null);
+  // EDIT
+  const handleEdit = (item: Diagnosis) => {
+    setEditId(item.diagnosis_id);
+    setFormData({
+      icd_code: item.icd_code,
+      description: item.description,
+    });
+    setIsFormVisible(true);
+  };
+
+  // DELETE
+  const handleDelete = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this data?")) return;
+
+    try {
+      await deleteDiagnosis(id);
+      fetchData();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
   };
 
   // PAGINATION
@@ -76,37 +105,56 @@ export default function PayorsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-emerald-800">
-          Payors
-        </h1>
-        <button
-          onClick={handleAdd}
-          className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
-        >
-          Add Payor
-        </button>
-      </div>
+      <h1 className="text-2xl font-bold text-emerald-800">Diagnosis</h1>
 
-      {isFormOpen && (
-        <PayorForm
-          payor={editingPayor}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
+      <button
+        onClick={() => setIsFormVisible(!isFormVisible)}
+        className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+      >
+        {isFormVisible ? "Hide Form" : "Show Form"}
+      </button>
+
+      {/* FORM */}
+      {isFormVisible && (
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-2 gap-4 bg-white p-4 rounded shadow"
+        >
+          <input
+            name="icd_code"
+            placeholder="ICD Code"
+            value={formData.icd_code}
+            onChange={handleChange}
+            className="border p-2 rounded"
+          />
+
+          <input
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            className="border p-2 rounded"
+          />
+
+          <button
+            type="submit"
+            className="col-span-2 bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700"
+          >
+            {editId ? "Update Diagnosis" : "Add Diagnosis"}
+          </button>
+        </form>
       )}
 
       {/* TABLE */}
       <div className="overflow-x-auto bg-white rounded shadow">
         <table className="min-w-full divide-y divide-gray-200">
-
           <thead className="bg-emerald-200">
             <tr>
               <th className="px-4 py-2 text-left text-sm font-semibold">
-                Payor Name
+                ICD Code
               </th>
               <th className="px-4 py-2 text-left text-sm font-semibold">
-                Address
+                Description
               </th>
               <th className="px-4 py-2 text-center text-sm font-semibold">
                 Actions
@@ -117,34 +165,23 @@ export default function PayorsPage() {
           <tbody className="divide-y divide-gray-200">
             {currentItems.length > 0 ? (
               currentItems.map((item) => (
-                <tr key={item.payor_id} className="hover:bg-gray-50">
-
-                  <td className="px-4 py-2">
-                    {item.payor_name}
-                  </td>
-
-                  <td className="px-4 py-2">
-                    {item.address}
-                  </td>
-
+                <tr key={item.diagnosis_id} className="hover:bg-gray-50">
+                  <td className="px-4 py-2">{item.icd_code}</td>
+                  <td className="px-4 py-2">{item.description}</td>
                   <td className="px-4 py-2 flex justify-center gap-2">
-
                     <button
                       onClick={() => handleEdit(item)}
                       className="px-2 py-1 bg-yellow-400 rounded text-sm hover:bg-yellow-500"
                     >
                       Edit
                     </button>
-
                     <button
-                      onClick={() => handleDelete(item.payor_id)}
+                      onClick={() => handleDelete(item.diagnosis_id)}
                       className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
                     >
-                      Hapus
+                      Delete
                     </button>
-
                   </td>
-
                 </tr>
               ))
             ) : (
@@ -155,13 +192,11 @@ export default function PayorsPage() {
               </tr>
             )}
           </tbody>
-
         </table>
       </div>
 
       {/* PAGINATION */}
       <div className="flex gap-2 mt-4 justify-center items-center">
-
         <button
           className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
           disabled={currentPage === 1}
@@ -191,9 +226,7 @@ export default function PayorsPage() {
         >
           Next
         </button>
-
       </div>
-
     </div>
   );
 }
