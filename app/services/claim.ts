@@ -5,6 +5,7 @@ export interface Claim {
     member_id: number;
     provider_id: number;
     diagnosis_id: string;
+    status: string;
     admission_date: string;
     discharge_date: string;
     incurred: number;
@@ -15,6 +16,7 @@ export interface Claim {
     diagnosis_name: string;
     customer_name: string;
     payor_name: string;
+    terms_and_conditions: string;
   }
   
   export async function getClaims(): Promise<Claim[]> {

@@ -55,6 +55,9 @@ export default function ClaimsPage() {
                   Diagnosis
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">
                   Admission
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold">
@@ -88,6 +91,9 @@ export default function ClaimsPage() {
                       {claim.diagnosis_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {claim.status}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {formatDate(claim.admission_date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-right">
@@ -103,7 +109,7 @@ export default function ClaimsPage() {
                       <Link
                         href={`/claims/${claim.claim_id}`}
                         className="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">
-                        Detail
+                        Adjustment
                       </Link>
                     </td>
                   </tr>
