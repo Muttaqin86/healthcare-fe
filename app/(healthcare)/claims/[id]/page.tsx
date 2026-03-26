@@ -260,7 +260,7 @@ export default function ClaimDetailPage() {
       )}
 
 
-<div className="mt-4 flex gap-2">
+<div className="mt-6 flex flex-wrap justify-center  gap-4">
   <button
     onClick={() => handleUpdateStatus("APPROVED")}
     className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"

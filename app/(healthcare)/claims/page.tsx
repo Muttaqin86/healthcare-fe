@@ -88,7 +88,7 @@ export default function ClaimsPage() {
                       {claim.provider_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {claim.diagnosis_name}
+                      {claim.diagnosis_id} - {claim.diagnosis_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {claim.status}
