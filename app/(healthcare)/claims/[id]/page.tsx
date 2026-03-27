@@ -149,7 +149,7 @@ export default function ClaimDetailPage() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Claim Details</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Claim Adjustment</h1>
       <div className="bg-white rounded-lg shadow-md overflow-hidden p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -260,6 +260,32 @@ export default function ClaimDetailPage() {
       )}
 
 
+
+<div className="mt-6 bg-white rounded-lg shadow-md p-6">
+  <h3 className="text-lg font-semibold text-gray-700">
+    Diagnosis Coverage Analysis
+  </h3>
+
+  <div className="mt-4">
+    <button
+      onClick={handleCheckCoverage}
+      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      disabled={ragLoading}
+    >
+      {ragLoading ? "Checking..." : "Check Coverage"}
+    </button>
+  </div>
+
+  {ragResult && (
+    <div className="mt-4 p-4 bg-gray-50 border rounded-md">
+      <p className="text-sm text-gray-700 whitespace-pre-line">
+        {ragResult}
+      </p>
+    </div>
+  )}
+</div>
+
+
 <div className="mt-6 flex flex-wrap justify-center  gap-4">
   <button
     onClick={() => handleUpdateStatus("APPROVED")}
@@ -284,31 +310,6 @@ export default function ClaimDetailPage() {
   >
     Pending
   </button>
-</div>
-
-
-<div className="mt-6 bg-white rounded-lg shadow-md p-6">
-  <h3 className="text-lg font-semibold text-gray-700">
-    Diagnosis Coverage Analysis
-  </h3>
-
-  <div className="mt-4">
-    <button
-      onClick={handleCheckCoverage}
-      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      disabled={ragLoading}
-    >
-      {ragLoading ? "Checking..." : "Check Coverage"}
-    </button>
-  </div>
-
-  {ragResult && (
-    <div className="mt-4 p-4 bg-gray-50 border rounded-md">
-      <p className="text-sm text-gray-700 whitespace-pre-line">
-        {ragResult}
-      </p>
-    </div>
-  )}
 </div>
 
 
