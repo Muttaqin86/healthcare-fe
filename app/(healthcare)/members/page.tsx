@@ -16,12 +16,16 @@ type Member = {
   customer_name?: string;
   payor_name?: string;
   address: string;
+  terms_and_conditions?: string;
 };
 
 export default function MembersPage() {
   const [data, setData] = useState<Member[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
+
+  const [isTncModalOpen, setIsTncModalOpen] = useState(false);
+  const [tncContent, setTncContent] = useState("");
 
   const [formData, setFormData] = useState({
     member_name: "",
@@ -232,6 +236,17 @@ export default function MembersPage() {
                   </td>
 
                   <td className="px-4 py-2 flex justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        setTncContent(
+                          item.terms_and_conditions || "Terms and conditions tidak tersedia"
+                        );
+                        setIsTncModalOpen(true);
+                      }}
+                      className="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                    >
+                      View Terms
+                    </button>
 
                     <button
                       onClick={() => handleEdit(item)}
@@ -246,7 +261,6 @@ export default function MembersPage() {
                     >
                       Delete
                     </button>
-
                   </td>
 
                 </tr>
@@ -262,6 +276,26 @@ export default function MembersPage() {
 
         </table>
       </div>
+
+      {/* MODAL */}
+      {isTncModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-w-3xl w-full rounded bg-white p-6 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Terms and Conditions</h2>
+              <button
+                onClick={() => setIsTncModalOpen(false)}
+                className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Close
+              </button>
+            </div>
+            <div className="h-72 overflow-y-auto border p-4 rounded bg-slate-50 text-sm whitespace-pre-wrap">
+              {tncContent}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* PAGINATION */}
       <div className="flex gap-2 mt-4 justify-center items-center">

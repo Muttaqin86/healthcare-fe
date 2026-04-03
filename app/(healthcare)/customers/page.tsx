@@ -1,17 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCustomers } from "../../services/customer";
-
-type Customer = {
-  customer_id: number;
-  customer_name: string;
-  payor_name: string;
-  address: string;
-};
+import { getCustomers, createCustomer, updateCustomer, deleteCustomer, Customer } from "../../services/customer";
+import CustomerForm from "./components/CustomerForm";
 
 export default function CustomersPage() {
   const [data, setData] = useState<Customer[]>([]);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +27,47 @@ export default function CustomersPage() {
     fetchData();
   }, []);
 
+  const handleAdd = () => {
+    setEditingCustomer(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEdit = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = async (customer_id: number) => {
+    if (window.confirm('Are you sure you want to delete this customer?')) {
+      try {
+        await deleteCustomer(customer_id);
+        fetchData();
+      } catch (error) {
+        console.error('Failed to delete customer', error);
+      }
+    }
+  };
+
+  const handleSave = async (customerData: { customer_name: string; payor_id: number; address: string }) => {
+    try {
+      if (editingCustomer) {
+        await updateCustomer(editingCustomer.customer_id, customerData as Omit<Customer, 'customer_id'>);
+      } else {
+        await createCustomer(customerData as Omit<Customer, 'customer_id'>);
+      }
+      fetchData();
+      setIsFormOpen(false);
+      setEditingCustomer(null);
+    } catch (error) {
+      console.error('Failed to save customer', error);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsFormOpen(false);
+    setEditingCustomer(null);
+  };
+
   // PAGINATION
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -39,10 +76,25 @@ export default function CustomersPage() {
 
   return (
     <div className="space-y-6 p-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-emerald-800">
+          Customers
+        </h1>
+        <button
+          onClick={handleAdd}
+          className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+        >
+          Add Customer
+        </button>
+      </div>
 
-      <h1 className="text-2xl font-bold text-emerald-800">
-        Customers
-      </h1>
+      {isFormOpen && (
+        <CustomerForm
+          customer={editingCustomer}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      )}
 
       {/* TABLE */}
       <div className="overflow-x-auto bg-white rounded shadow">
@@ -59,9 +111,9 @@ export default function CustomersPage() {
               <th className="px-4 py-2 text-left text-sm font-semibold">
                 Address
               </th>
-              {/* <th className="px-4 py-2 text-center text-sm font-semibold">
+              <th className="px-4 py-2 text-center text-sm font-semibold">
                 Actions
-              </th> */}
+              </th>
             </tr>
           </thead>
 
@@ -82,29 +134,29 @@ export default function CustomersPage() {
                     {item.address}
                   </td>
 
-                  {/* <td className="px-4 py-2 flex justify-center gap-2">
+                  <td className="px-4 py-2 flex justify-center gap-2">
 
                     <button
-                      // onClick={() => handleEdit(item)}
+                      onClick={() => handleEdit(item)}
                       className="px-2 py-1 bg-yellow-400 rounded text-sm hover:bg-yellow-500"
                     >
                       Edit
                     </button>
 
                     <button
-                      // onClick={() => handleDelete(item.payor_id)}
+                      onClick={() => handleDelete(item.customer_id)}
                       className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
                     >
-                      Hapus
+                      Delete
                     </button>
 
-                  </td> */}
+                  </td>
 
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="text-center py-6 text-gray-500">
+                <td colSpan={4} className="text-center py-6 text-gray-500">
                   No data available
                 </td>
               </tr>
