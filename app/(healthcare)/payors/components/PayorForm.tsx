@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Payor } from "../../services/payor";
+import { Payor } from "../../../services/payor";
 
 interface PayorFormProps {
   payor: Payor | null;

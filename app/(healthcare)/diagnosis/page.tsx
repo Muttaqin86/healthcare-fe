@@ -25,7 +25,7 @@ export default function DiagnosisPage() {
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   const [isFormVisible, setIsFormVisible] = useState(false);
 

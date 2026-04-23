@@ -7,7 +7,7 @@ import { getClaims, Claim } from "@/app/services/claim";
 export default function ClaimsPage() {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     async function fetchData() {
