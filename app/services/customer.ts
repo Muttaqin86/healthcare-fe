@@ -1,4 +1,5 @@
 // app/services/customer.ts
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Customer {
     customer_id: number;
@@ -10,7 +11,7 @@ export interface Customer {
   
   export async function getCustomers(): Promise<Customer[]> {
     try {
-      const response = await fetch('http://localhost:5000/api/customer', { cache: 'no-store' });
+      const response = await fetch(`${API_URL}/api/customer`, { cache: 'no-store' });
   
       if (!response.ok) {
         throw new Error('Failed to fetch customers');
@@ -25,7 +26,7 @@ export interface Customer {
   }
   
   export async function createCustomer(customer: Omit<Customer, 'customer_id'>): Promise<Customer> {
-  const response = await fetch('http://localhost:5000/api/customer', {
+  const response = await fetch(`${API_URL}/api/customer`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ export interface Customer {
 }
 
 export async function updateCustomer(customer_id: number, customer: Omit<Customer, 'customer_id'>): Promise<Customer> {
-  const response = await fetch(`http://localhost:5000/api/customer/${customer_id}`, {
+  const response = await fetch(`${API_URL}/api/customer/${customer_id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -61,7 +62,7 @@ export async function updateCustomer(customer_id: number, customer: Omit<Custome
 }
 
 export async function deleteCustomer(customer_id: number): Promise<void> {
-  const response = await fetch(`http://localhost:5000/api/customer/${customer_id}`, {
+  const response = await fetch(`${API_URL}/api/customer/${customer_id}`, {
     method: 'DELETE',
   });
 

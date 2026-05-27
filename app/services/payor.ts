@@ -1,4 +1,5 @@
 // app/services/payor.ts
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Payor {
     payor_id: number;
@@ -8,7 +9,7 @@ export interface Payor {
 
 export async function getPayors(): Promise<Payor[]> {
   try {
-    const response = await fetch('http://localhost:5000/api/payor', { cache: 'no-store' });
+    const response = await fetch(`${API_URL}/api/payor`, { cache: 'no-store' });
 
     if (!response.ok) {
       throw new Error('Failed to fetch payors');
@@ -23,7 +24,7 @@ export async function getPayors(): Promise<Payor[]> {
 }
 
 export async function createPayor(payor: Omit<Payor, 'payor_id'>): Promise<Payor> {
-  const response = await fetch('http://localhost:5000/api/payor', {
+  const response = await fetch(`${API_URL}/api/payor`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ export async function createPayor(payor: Omit<Payor, 'payor_id'>): Promise<Payor
 }
 
 export async function updatePayor(payor_id: number, payor: Omit<Payor, 'payor_id'>): Promise<Payor> {
-  const response = await fetch(`http://localhost:5000/api/payor/${payor_id}`, {
+  const response = await fetch(`${API_URL}/api/payor/${payor_id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -59,7 +60,7 @@ export async function updatePayor(payor_id: number, payor: Omit<Payor, 'payor_id
 }
 
 export async function deletePayor(payor_id: number): Promise<void> {
-  const response = await fetch(`http://localhost:5000/api/payor/${payor_id}`, {
+  const response = await fetch(`${API_URL}/api/payor/${payor_id}`, {
     method: 'DELETE',
   });
 
